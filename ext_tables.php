@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('TYPO3_MODE')) {
+if (!defined('TYPO3')) {
     die('Access denied.');
 }
 
@@ -23,59 +23,16 @@ if (!defined('TYPO3_MODE')) {
         \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version()
     );
 
-    // Backend Module is deprecated with v11, and we disable this.
-    // With the Extension Configuration you can activate this Backend Module to find out the mapping
-    if (
-        version_compare((string)$typo3VersionArray['version_main'], '11', '<')
-        || (
-            version_compare((string)$typo3VersionArray['version_main'], '11', '=')
-            && isset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['wv_deepltranslate']['activateBackendModule'])
-            && (bool)$GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['wv_deepltranslate']['activateBackendModule'] === true
-        )
-    ) {
-        //register backend module
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-            'WebVision.WvDeepltranslate',
-            'Deepl',
-            '',
-            '',
-            [],
-            [
-                'icon'   => 'EXT:wv_deepltranslate/Resources/Public/Icons/deepl.svg',
-                'access' => 'user,group',
-                'labels' => 'LLL:EXT:wv_deepltranslate/Resources/Private/Language/locallang.xlf',
-            ]
-        );
-
-        if (version_compare((string)$typo3VersionArray['version_main'], '10', '<')) {
-            $actionsControllerArray = [
-                'Settings' => 'index,saveSettings',
-            ];
-        } else {
-            $actionsControllerArray = [
-                \WebVision\WvDeepltranslate\Controller\SettingsController::class => 'index,saveSettings',
-            ];
-        }
-
-        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-            'WebVision.WvDeepltranslate',
-            'Deepl',
-            'Settings',
-            '',
-            $actionsControllerArray,
-            [
-                'icon'   => 'EXT:install/Resources/Public/Icons/module-install-settings.svg',
-                'access' => 'user,group',
-                'labels' => 'LLL:EXT:wv_deepltranslate/Resources/Private/Language/locallang_module_settings.xlf',
-            ]
+    if (\WebVision\WvDeepltranslate\Utility\DeeplBackendUtility::isDeeplApiKeySet()) {
+        /** @var \TYPO3\CMS\Core\Page\PageRenderer $pageRenderer */
+        $pageRenderer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Page\PageRenderer::class);
+        $pageRenderer->loadJavaScriptModule(
+            '@web-vision/wv-deepltranslate/localization.js',
         );
     }
 
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['locallangXMLOverride']['EXT:backend/Resources/Private/Language/locallang_layout.xlf'][] = 'EXT:wv_deepltranslate/Resources/Private/Language/locallang.xlf';
 
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_wvdeepltranslate_domain_model_glossaries', 'EXT:wv_deepltranslate/Resources/Private/Language/locallang_csh_tx_wvdeepltranslate_domain_model_glossaries.xlf');
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_wvdeepltranslate_domain_model_glossaries');
-
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_wvdeepltranslate_domain_model_glossariessync', 'EXT:wv_deepltranslate/Resources/Private/Language/locallang_csh_tx_wvdeepltranslate_domain_model_glossariessync.xlf');
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_wvdeepltranslate_domain_model_glossariessync');
 })();

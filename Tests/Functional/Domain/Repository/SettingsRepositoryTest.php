@@ -7,7 +7,6 @@ namespace WebVision\WvDeepltranslate\Tests\Functional\Domain\Repository;
 use Nimut\TestingFramework\TestCase\FunctionalTestCase;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use WebVision\WvDeepltranslate\Domain\Repository\SettingsRepository;
 
 /**
@@ -33,7 +32,7 @@ class SettingsRepositoryTest extends FunctionalTestCase
     /** @test */
     public function insertSettingsRecord(): void
     {
-        $settingsRepository = GeneralUtility::makeInstance(ObjectManager::class)->get(SettingsRepository::class);
+        $settingsRepository = GeneralUtility::makeInstance(SettingsRepository::class);
         $settingsRepository->insertDeeplSettings(
             0,
             ['1' => 'de']
@@ -50,7 +49,7 @@ class SettingsRepositoryTest extends FunctionalTestCase
     /** @test */
     public function updateSettingsRecord(): void
     {
-        $settingsRepository = GeneralUtility::makeInstance(ObjectManager::class)->get(SettingsRepository::class);
+        $settingsRepository = GeneralUtility::makeInstance(SettingsRepository::class);
         $settingsRepository->updateDeeplSettings(1, serialize(['1' => 'EN']));
 
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName(ConnectionPool::DEFAULT_CONNECTION_NAME);
@@ -62,7 +61,7 @@ class SettingsRepositoryTest extends FunctionalTestCase
     /** @test */
     public function checkSelectAssignments(): void
     {
-        $settingsRepository = GeneralUtility::makeInstance(ObjectManager::class)->get(SettingsRepository::class);
+        $settingsRepository = GeneralUtility::makeInstance(SettingsRepository::class);
         $settings = $settingsRepository->getSettings();
 
         static::assertSame(1, $settings->getUid());
@@ -73,7 +72,7 @@ class SettingsRepositoryTest extends FunctionalTestCase
     /** @test */
     public function findMappingsByUid(): void
     {
-        $settingsRepository = GeneralUtility::makeInstance(ObjectManager::class)->get(SettingsRepository::class);
+        $settingsRepository = GeneralUtility::makeInstance(SettingsRepository::class);
         $mapping = $settingsRepository->getMappings(1);
 
         static::assertSame('de', $mapping);
@@ -82,7 +81,7 @@ class SettingsRepositoryTest extends FunctionalTestCase
     /** @test */
     public function getApiSupportedLanguageWhenDatabaseConfigurationEmpty(): void
     {
-        $settingsRepository = GeneralUtility::makeInstance(ObjectManager::class)->get(SettingsRepository::class);
+        $settingsRepository = GeneralUtility::makeInstance(SettingsRepository::class);
         $inputArray = [
             'hallo' => 'welt',
         ];
@@ -95,7 +94,7 @@ class SettingsRepositoryTest extends FunctionalTestCase
     /** @test */
     public function getApiSupportedLanguage(): void
     {
-        $settingsRepository = GeneralUtility::makeInstance(ObjectManager::class)->get(SettingsRepository::class);
+        $settingsRepository = GeneralUtility::makeInstance(SettingsRepository::class);
         $inputArray = [
             'hallo' => 'welt',
         ];

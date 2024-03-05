@@ -150,42 +150,6 @@ class LanguageService
                 'language_isocode' => $languageIsoCode,
             ];
         }
-
-        // v9 and v10 sys_language_uid goes from here
-        /** @deprecated will be removed in version 4 */
-        $targetLanguageRecord = $this->getRecordFromSysLanguage($languageId);
-
-        $targetLanguageMapping = $this->settingsRepository->getMappings((int)$targetLanguageRecord['uid']);
-        if ($targetLanguageMapping === '') {
-            throw new LanguageIsoCodeNotFoundException(
-                sprintf(
-                    'No API supported target found for language "%s"',
-                    $targetLanguageRecord['title']
-                ),
-                1676741846
-            );
-        }
-        $targetLanguageRecord['language_isocode'] = strtoupper($targetLanguageMapping);
-
-        return $targetLanguageRecord;
-    }
-
-    /**
-     * @return array{uid: int, title: string, language_isocode: string}
-     * @throws LanguageRecordNotFoundException
-     */
-    private function getRecordFromSysLanguage(int $uid): array
-    {
-        $languageRecord = BackendUtility::getRecord('sys_language', $uid, 'uid,title,language_isocode');
-        if ($languageRecord === null) {
-            throw new LanguageRecordNotFoundException(
-                sprintf('No language for record with uid "%d" found.', $uid),
-                1676739761064
-            );
-        }
-        $languageRecord['language_isocode'] = strtoupper($languageRecord['language_isocode']);
-
-        return $languageRecord;
     }
 
     public function isSiteLanguageMode(): bool

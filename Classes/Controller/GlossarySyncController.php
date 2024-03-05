@@ -54,7 +54,7 @@ class GlossarySyncController
                 'glossary.sync.title',
                 'wv_deepltranslate'
             ),
-            FlashMessage::OK,
+            \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::OK,
             true
         );
 

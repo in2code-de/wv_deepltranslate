@@ -11,7 +11,6 @@ use TYPO3\CMS\Core\Http\Request;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use WebVision\WvDeepltranslate\Client;
 use WebVision\WvDeepltranslate\Domain\Repository\GlossaryRepository;
 use WebVision\WvDeepltranslate\Domain\Repository\SettingsRepository;
@@ -52,8 +51,7 @@ class DeeplService
         $this->client = $client ?? GeneralUtility::makeInstance(Client::class);
         $this->glossaryRepository = GeneralUtility::makeInstance(GlossaryRepository::class);
 
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->deeplSettingsRepository = $objectManager->get(SettingsRepository::class);
+        $this->deeplSettingsRepository = GeneralUtility::makeInstance(SettingsRepository::class);
 
         $this->loadSupportedLanguages();
         $this->apiSupportedLanguages['target'] = $this->deeplSettingsRepository->getSupportedLanguages($this->apiSupportedLanguages['target']);
@@ -88,7 +86,7 @@ class DeeplService
                 FlashMessage::class,
                 $e->getMessage(),
                 '',
-                FlashMessage::INFO
+                \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::INFO
             );
             GeneralUtility::makeInstance(FlashMessageService::class)
                 ->getMessageQueueByIdentifier()

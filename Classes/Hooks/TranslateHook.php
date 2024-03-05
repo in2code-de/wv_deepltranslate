@@ -8,7 +8,6 @@ use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use WebVision\WvDeepltranslate\Domain\Repository\PageRepository;
 use WebVision\WvDeepltranslate\Domain\Repository\SettingsRepository;
 use WebVision\WvDeepltranslate\Exception\LanguageIsoCodeNotFoundException;
@@ -36,10 +35,9 @@ class TranslateHook
         ?DeeplService $deeplService = null,
         ?GoogleTranslateService $googleService = null
     ) {
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->deeplSettingsRepository = $settingsRepository ?? $objectManager->get(SettingsRepository::class);
-        $this->deeplService = $deeplService ?? $objectManager->get(DeeplService::class);
-        $this->googleService = $googleService ?? $objectManager->get(GoogleTranslateService::class);
+        $this->deeplSettingsRepository = $settingsRepository ?? GeneralUtility::makeInstance(SettingsRepository::class);
+        $this->deeplService = $deeplService ?? GeneralUtility::makeInstance(DeeplService::class);
+        $this->googleService = $googleService ?? GeneralUtility::makeInstance(GoogleTranslateService::class);
         $this->pageRepository = $pageRepository ?? GeneralUtility::makeInstance(PageRepository::class);
         $this->languageService = GeneralUtility::makeInstance(LanguageService::class);
     }
@@ -100,7 +98,7 @@ class TranslateHook
                 FlashMessage::class,
                 $e->getMessage(),
                 '',
-                FlashMessage::INFO
+                \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::INFO
             );
             GeneralUtility::makeInstance(FlashMessageService::class)
                 ->getMessageQueueByIdentifier()

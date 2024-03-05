@@ -122,7 +122,7 @@ class DeeplGlossaryService
                 FlashMessage::class,
                 $e->getMessage(),
                 'DeepL Api',
-                FlashMessage::WARNING,
+                \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::WARNING,
                 true
             );
             $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);

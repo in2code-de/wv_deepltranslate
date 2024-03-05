@@ -62,7 +62,7 @@ class UpdatedGlossaryEntryTermHook
                 'glossary.not-sync.title',
                 'wv_deepltranslate'
             ),
-            FlashMessage::INFO,
+            \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::INFO,
             true
         );
 

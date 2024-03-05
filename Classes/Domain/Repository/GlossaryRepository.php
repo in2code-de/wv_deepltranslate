@@ -17,6 +17,7 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use WebVision\WvDeepltranslate\Service\Client\DeepLException;
 use WebVision\WvDeepltranslate\Service\DeeplGlossaryService;
+use WebVision\WvDeepltranslate\Utility\PageUtility;
 
 class GlossaryRepository
 {
@@ -467,7 +468,7 @@ class GlossaryRepository
         $site = GeneralUtility::makeInstance(SiteFinder::class)
             ->getSiteByPageId($pageId);
         $rootPage = $site->getRootPageId();
-        $allPages = GeneralUtility::makeInstance(QueryGenerator::class)
+        $allPages = GeneralUtility::makeInstance(PageUtility::class)
             ->getTreeList($rootPage, 999);
         $db = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('pages');

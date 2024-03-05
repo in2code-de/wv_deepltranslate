@@ -11,21 +11,20 @@ use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use TYPO3\CMS\Recordlist\Controller\RecordListController;
 use WebVision\WvDeepltranslate\Service\DeeplGlossaryService;
 use WebVision\WvDeepltranslate\Utility\DeeplBackendUtility;
 
-class DeeplRecordListController extends RecordListController
+class DeeplRecordListController extends \TYPO3\CMS\Backend\Controller\RecordListController
 {
     /**
      * @param string $requestUri
      */
-    protected function languageSelector($requestUri): string
+    protected function languageSelector($siteLanguages, $requestUri): string
     {
         if ($this->pageInfo['module'] === 'glossary') {
-            return $this->buildGlossaryTranslationOptionDropdown($requestUri);
+            return $this->buildGlossaryTranslationOptionDropdown($siteLanguages, $requestUri);
         }
-        $originalOutput = parent::languageSelector($requestUri);
+        $originalOutput = parent::languageSelector($siteLanguages, $requestUri);
 
         if ($originalOutput == '') {
             return $originalOutput;
@@ -36,7 +35,7 @@ class DeeplRecordListController extends RecordListController
         }
 
         $options = DeeplBackendUtility::buildTranslateDropdown(
-            $this->siteLanguages,
+            $siteLanguages,
             $this->id,
             $requestUri
         );
@@ -45,20 +44,20 @@ class DeeplRecordListController extends RecordListController
             return $originalOutput;
         }
 
-        return str_replace(
-            '<div class="col-auto">',
-            '<div class="col-auto row"><div class="col-sm-6">',
-            $originalOutput
-        )
-            . '<div class="col-sm-6">'
+        $additionalContent = '<div class="col-sm-2">'
             . '<select class="form-select" name="createNewLanguage" data-global-event="change" data-action-navigate="$value">'
             . $options
             . '</select>'
-            . '</div>'
             . '</div>';
+
+        return str_replace(
+                '</select></div></div>',
+                '</select></div>' . $additionalContent . '</div>',
+                $originalOutput
+            );
     }
 
-    private function buildGlossaryTranslationOptionDropdown(string $requestUri): string
+    private function buildGlossaryTranslationOptionDropdown(array $siteLanguages, string $requestUri): string
     {
         if (!$this->getBackendUserAuthentication()->check('tables_modify', 'pages')) {
             return '';
@@ -73,7 +72,7 @@ class DeeplRecordListController extends RecordListController
         $possibleGlossaryEntryLanguages = $possiblePairs[$defaultLanguageIsoCode] ?? [];
 
         $availableTranslations = [];
-        foreach ($this->siteLanguages as $siteLanguage) {
+        foreach ($siteLanguages as $siteLanguage) {
             if ($siteLanguage->getLanguageId() === 0) {
                 continue;
             }
@@ -92,7 +91,8 @@ class DeeplRecordListController extends RecordListController
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class))
-            ->add(GeneralUtility::makeInstance(WorkspaceRestriction::class, (int)$this->getBackendUserAuthentication()->workspace));
+            ->add(GeneralUtility::makeInstance(WorkspaceRestriction::class,
+                (int)$this->getBackendUserAuthentication()->workspace));
         $statement = $queryBuilder->select('uid', $languageField)
             ->from('pages')
             ->where(
@@ -110,11 +110,11 @@ class DeeplRecordListController extends RecordListController
             return '';
         }
         $output = '<option value="">' . htmlspecialchars(
-            (string)LocalizationUtility::translate(
-                'pages.glossary.translate',
-                'wv_deepltranslate'
-            )
-        ) . '</option>';
+                (string)LocalizationUtility::translate(
+                    'pages.glossary.translate',
+                    'wv_deepltranslate'
+                )
+            ) . '</option>';
 
         /**
          * code copied from RecordListController
